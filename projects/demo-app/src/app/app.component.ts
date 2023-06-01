@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Dimensions, ImageCroppedEvent, ImageTransform } from 'ngx-image-cropper';
+import { CropperPosition } from 'projects/ngx-image-cropper/src';
 
 @Component({
   selector: 'app-root',
@@ -24,15 +25,22 @@ export class AppComponent {
   loading = false;
   allowMoveImage = false;
   hidden = false;
+  aspect = 0;
 
   fileChangeEvent(event: any): void {
     this.loading = true;
     this.imageChangedEvent = event;
   }
 
+
   imageCropped(event: ImageCroppedEvent) {
     this.croppedImage = event.base64;
-    console.log(event);
+  }
+
+  transformed(event: CropperPosition) {
+    const w = event.x1 - event.x2;
+    const h = event.y1 - event.y2;
+    this.aspect = w / h;
   }
 
   imageLoaded() {

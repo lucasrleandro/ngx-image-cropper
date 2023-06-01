@@ -34,12 +34,11 @@
   <image-cropper
     [imageChangedEvent]="imageChangedEvent"
     [imageURL]="imageURL"
-    [maintainAspectRatio]="true"
-    [containWithinAspectRatio]="containWithinAspectRatio"
-    [aspectRatio]="aspectRatio"
+    [maintainAspectRatio]="false"
+    [containWithinAspectRatio]="false"
     [resizeToWidth]="128"
     [cropperMinWidth]="128"
-    [onlyScaleDown]="true"
+    [onlyScaleDown]="false"
     [roundCropper]="false"
     [canvasRotation]="canvasRotation"
     [(transform)]="transform"
@@ -51,10 +50,16 @@
     backgroundColor="red"
     format="png"
     (imageCropped)="imageCropped($event)"
+    (cropping)="transformed($event)"
     (imageLoaded)="imageLoaded()"
     (cropperReady)="cropperReady($event)"
     (loadImageFailed)="loadImageFailed()"
   ></image-cropper>
   <div *ngIf="loading" class="loader">Loading...</div>
 </div>
-<img [src]="croppedImage" [style.border]="croppedImage ? '1px solid black' : 'none'" />
+<!-- <img [src]="croppedImage" [style.border]="croppedImage ? '1px solid black' : 'none'" /> -->
+
+<span *ngIf="aspect">
+  {{ aspect < .75 ? 'Aumente a largura ou diminua a altura' : (  (aspect > 1.5) ? 'Aumente a altura ou diminua a largura' : 'OK!' ) }}
+</span>
+

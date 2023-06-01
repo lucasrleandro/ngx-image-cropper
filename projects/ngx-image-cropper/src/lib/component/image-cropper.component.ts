@@ -99,7 +99,7 @@ export class ImageCropperComponent implements OnChanges, OnInit {
   @Output() cropperReady = new EventEmitter<Dimensions>();
   @Output() loadImageFailed = new EventEmitter<void>();
   @Output() transformChange = new EventEmitter<ImageTransform>();
-
+  @Output() cropping = new EventEmitter<CropperPosition>();
 
   constructor(
     private cropService: CropService,
@@ -413,6 +413,7 @@ export class ImageCropperComponent implements OnChanges, OnInit {
       } else if (this.moveStart!.type === MoveTypes.Resize) {
         if (!this.cropperStaticWidth && !this.cropperStaticHeight) {
           this.cropperPositionService.resize(event, this.moveStart!, this.cropper, this.maxSize, this.settings);
+          this.cropping.emit(this.cropper);
         }
         this.checkCropperPosition(false);
       } else if (this.moveStart!.type === MoveTypes.Drag) {
@@ -524,6 +525,7 @@ export class ImageCropperComponent implements OnChanges, OnInit {
   @HostListener('document:touchend')
   moveStop(): void {
     if (this.moveStart!.active) {
+      console.log('change!');
       this.moveStart!.active = false;
       if (this.moveStart?.type === MoveTypes.Drag) {
         this.transformChange.emit(this.transform);
