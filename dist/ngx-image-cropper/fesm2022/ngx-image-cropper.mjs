@@ -1,6 +1,5 @@
 import * as i0 from '@angular/core';
 import { Injectable, EventEmitter, isDevMode, Component, ChangeDetectionStrategy, ViewChild, Input, HostBinding, Output, HostListener, NgModule } from '@angular/core';
-import { __awaiter } from 'tslib';
 import * as i4 from '@angular/platform-browser';
 import * as i5 from '@angular/common';
 import { CommonModule } from '@angular/common';
@@ -211,7 +210,7 @@ class CropService {
         const output = {
             width, height,
             imagePosition,
-            cropperPosition: Object.assign({}, cropper)
+            cropperPosition: { ...cropper }
         };
         if (settings.containWithinAspectRatio) {
             output.offsetImagePosition = this.getOffsetImagePosition(sourceImage, loadedImage, cropper, settings);
@@ -309,17 +308,17 @@ class CropService {
     getQuality(settings) {
         return Math.min(1, Math.max(0, settings.imageQuality / 100));
     }
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: CropService, deps: [], target: i0.ɵɵFactoryTarget.Injectable }); }
+    static { this.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: CropService, providedIn: 'root' }); }
 }
-CropService.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: CropService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
-CropService.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: CropService, providedIn: 'root' });
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: CropService, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: CropService, decorators: [{
             type: Injectable,
             args: [{ providedIn: 'root' }]
         }] });
 
 class CropperPositionService {
     resetCropperPosition(sourceImage, cropperPosition, settings) {
-        if (!(sourceImage === null || sourceImage === void 0 ? void 0 : sourceImage.nativeElement)) {
+        if (!sourceImage?.nativeElement) {
             return;
         }
         const sourceImageElement = sourceImage.nativeElement;
@@ -503,17 +502,15 @@ class CropperPositionService {
         }
     }
     getClientX(event) {
-        var _a;
-        return ((_a = event.touches) === null || _a === void 0 ? void 0 : _a[0].clientX) || event.clientX || 0;
+        return event.touches?.[0].clientX || event.clientX || 0;
     }
     getClientY(event) {
-        var _a;
-        return ((_a = event.touches) === null || _a === void 0 ? void 0 : _a[0].clientY) || event.clientY || 0;
+        return event.touches?.[0].clientY || event.clientY || 0;
     }
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: CropperPositionService, deps: [], target: i0.ɵɵFactoryTarget.Injectable }); }
+    static { this.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: CropperPositionService, providedIn: 'root' }); }
 }
-CropperPositionService.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: CropperPositionService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
-CropperPositionService.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: CropperPositionService, providedIn: 'root' });
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: CropperPositionService, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: CropperPositionService, decorators: [{
             type: Injectable,
             args: [{ providedIn: 'root' }]
         }] });
@@ -640,7 +637,7 @@ class LoadImageService {
                 const context = canvas.getContext('2d');
                 canvas.width = img.width;
                 canvas.height = img.height;
-                context === null || context === void 0 ? void 0 : context.drawImage(img, 0, 0);
+                context?.drawImage(img, 0, 0);
                 this.loadBase64Image(canvas.toDataURL(), cropperSettings).then(resolve);
             };
             img.crossOrigin = 'anonymous';
@@ -658,76 +655,72 @@ class LoadImageService {
             originalImage.src = imageBase64;
         }).then((res) => this.transformImageBase64(res, cropperSettings));
     }
-    transformImageBase64(res, cropperSettings) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const autoRotate = yield this.autoRotateSupported;
-            const exifTransform = yield getTransformationsFromExifData(autoRotate ? -1 : res.originalBase64);
-            if (!res.originalImage || !res.originalImage.complete) {
-                return Promise.reject(new Error('No image loaded'));
-            }
-            const loadedImage = {
-                original: {
-                    base64: res.originalBase64,
-                    image: res.originalImage,
-                    size: {
-                        width: res.originalImage.naturalWidth,
-                        height: res.originalImage.naturalHeight
-                    }
-                },
-                exifTransform
-            };
-            return this.transformLoadedImage(loadedImage, cropperSettings);
-        });
+    async transformImageBase64(res, cropperSettings) {
+        const autoRotate = await this.autoRotateSupported;
+        const exifTransform = await getTransformationsFromExifData(autoRotate ? -1 : res.originalBase64);
+        if (!res.originalImage || !res.originalImage.complete) {
+            return Promise.reject(new Error('No image loaded'));
+        }
+        const loadedImage = {
+            original: {
+                base64: res.originalBase64,
+                image: res.originalImage,
+                size: {
+                    width: res.originalImage.naturalWidth,
+                    height: res.originalImage.naturalHeight
+                }
+            },
+            exifTransform
+        };
+        return this.transformLoadedImage(loadedImage, cropperSettings);
     }
-    transformLoadedImage(loadedImage, cropperSettings) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const canvasRotation = cropperSettings.canvasRotation + loadedImage.exifTransform.rotate;
-            const originalSize = {
-                width: loadedImage.original.image.naturalWidth,
-                height: loadedImage.original.image.naturalHeight
-            };
-            if (canvasRotation === 0 && !loadedImage.exifTransform.flip && !cropperSettings.containWithinAspectRatio) {
-                return {
-                    original: {
-                        base64: loadedImage.original.base64,
-                        image: loadedImage.original.image,
-                        size: Object.assign({}, originalSize)
-                    },
-                    transformed: {
-                        base64: loadedImage.original.base64,
-                        image: loadedImage.original.image,
-                        size: Object.assign({}, originalSize)
-                    },
-                    exifTransform: loadedImage.exifTransform
-                };
-            }
-            const transformedSize = this.getTransformedSize(originalSize, loadedImage.exifTransform, cropperSettings);
-            const canvas = document.createElement('canvas');
-            canvas.width = transformedSize.width;
-            canvas.height = transformedSize.height;
-            const ctx = canvas.getContext('2d');
-            ctx === null || ctx === void 0 ? void 0 : ctx.setTransform(loadedImage.exifTransform.flip ? -1 : 1, 0, 0, 1, canvas.width / 2, canvas.height / 2);
-            ctx === null || ctx === void 0 ? void 0 : ctx.rotate(Math.PI * (canvasRotation / 2));
-            ctx === null || ctx === void 0 ? void 0 : ctx.drawImage(loadedImage.original.image, -originalSize.width / 2, -originalSize.height / 2);
-            const transformedBase64 = canvas.toDataURL();
-            const transformedImage = yield this.loadImageFromBase64(transformedBase64);
+    async transformLoadedImage(loadedImage, cropperSettings) {
+        const canvasRotation = cropperSettings.canvasRotation + loadedImage.exifTransform.rotate;
+        const originalSize = {
+            width: loadedImage.original.image.naturalWidth,
+            height: loadedImage.original.image.naturalHeight
+        };
+        if (canvasRotation === 0 && !loadedImage.exifTransform.flip && !cropperSettings.containWithinAspectRatio) {
             return {
                 original: {
                     base64: loadedImage.original.base64,
                     image: loadedImage.original.image,
-                    size: Object.assign({}, originalSize)
+                    size: { ...originalSize }
                 },
                 transformed: {
-                    base64: transformedBase64,
-                    image: transformedImage,
-                    size: {
-                        width: transformedImage.width,
-                        height: transformedImage.height
-                    }
+                    base64: loadedImage.original.base64,
+                    image: loadedImage.original.image,
+                    size: { ...originalSize }
                 },
                 exifTransform: loadedImage.exifTransform
             };
-        });
+        }
+        const transformedSize = this.getTransformedSize(originalSize, loadedImage.exifTransform, cropperSettings);
+        const canvas = document.createElement('canvas');
+        canvas.width = transformedSize.width;
+        canvas.height = transformedSize.height;
+        const ctx = canvas.getContext('2d');
+        ctx?.setTransform(loadedImage.exifTransform.flip ? -1 : 1, 0, 0, 1, canvas.width / 2, canvas.height / 2);
+        ctx?.rotate(Math.PI * (canvasRotation / 2));
+        ctx?.drawImage(loadedImage.original.image, -originalSize.width / 2, -originalSize.height / 2);
+        const transformedBase64 = canvas.toDataURL();
+        const transformedImage = await this.loadImageFromBase64(transformedBase64);
+        return {
+            original: {
+                base64: loadedImage.original.base64,
+                image: loadedImage.original.image,
+                size: { ...originalSize }
+            },
+            transformed: {
+                base64: transformedBase64,
+                image: transformedImage,
+                size: {
+                    width: transformedImage.width,
+                    height: transformedImage.height
+                }
+            },
+            exifTransform: loadedImage.exifTransform
+        };
     }
     loadImageFromBase64(imageBase64) {
         return new Promise(((resolve, reject) => {
@@ -768,10 +761,10 @@ class LoadImageService {
             height: originalSize.height
         };
     }
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: LoadImageService, deps: [], target: i0.ɵɵFactoryTarget.Injectable }); }
+    static { this.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: LoadImageService, providedIn: 'root' }); }
 }
-LoadImageService.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: LoadImageService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
-LoadImageService.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: LoadImageService, providedIn: 'root' });
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: LoadImageService, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: LoadImageService, decorators: [{
             type: Injectable,
             args: [{ providedIn: 'root' }]
         }] });
@@ -783,7 +776,7 @@ class ImageCropperComponent {
         this.loadImageService = loadImageService;
         this.sanitizer = sanitizer;
         this.cd = cd;
-        this.Hammer = (window === null || window === void 0 ? void 0 : window['Hammer']) || null;
+        this.Hammer = window?.['Hammer'] || null;
         this.settings = new CropperSettings();
         this.setImageMaxSizeRetries = 0;
         this.resizedWhileHidden = false;
@@ -836,10 +829,9 @@ class ImageCropperComponent {
         this.reset();
     }
     ngOnChanges(changes) {
-        var _a;
         this.onChangesUpdateSettings(changes);
         this.onChangesInputImage(changes);
-        if (((_a = this.loadedImage) === null || _a === void 0 ? void 0 : _a.original.image.complete) && (changes['containWithinAspectRatio'] || changes['canvasRotation'])) {
+        if (this.loadedImage?.original.image.complete && (changes['containWithinAspectRatio'] || changes['canvasRotation'])) {
             this.loadImageService
                 .transformLoadedImage(this.loadedImage, this.settings)
                 .then((res) => this.setLoadedImage(res))
@@ -904,12 +896,10 @@ class ImageCropperComponent {
         }
     }
     isValidImageChangedEvent() {
-        var _a, _b, _c;
-        return ((_c = (_b = (_a = this.imageChangedEvent) === null || _a === void 0 ? void 0 : _a.target) === null || _b === void 0 ? void 0 : _b.files) === null || _c === void 0 ? void 0 : _c.length) > 0;
+        return this.imageChangedEvent?.target?.files?.length > 0;
     }
     setCssTransform() {
-        var _a;
-        const translateUnit = ((_a = this.transform) === null || _a === void 0 ? void 0 : _a.translateUnit) || '%';
+        const translateUnit = this.transform?.translateUnit || '%';
         this.safeTransformStyle = this.sanitizer.bypassSecurityTrustStyle(`translate(${this.transform.translateH || 0}${translateUnit}, ${this.transform.translateV || 0}${translateUnit})` +
             ' scaleX(' + (this.transform.scale || 1) * (this.transform.flipH ? -1 : 1) + ')' +
             ' scaleY(' + (this.transform.scale || 1) * (this.transform.flipV ? -1 : 1) + ')' +
@@ -988,7 +978,7 @@ class ImageCropperComponent {
             this.setCropperScaledMinSize();
             this.setCropperScaledMaxSize();
             this.resetCropperPosition();
-            this.cropperReady.emit(Object.assign({}, this.maxSize));
+            this.cropperReady.emit({ ...this.maxSize });
             this.cd.markForCheck();
         }
         else {
@@ -997,8 +987,7 @@ class ImageCropperComponent {
         }
     }
     sourceImageLoaded() {
-        var _a, _b;
-        return ((_b = (_a = this.sourceImage) === null || _a === void 0 ? void 0 : _a.nativeElement) === null || _b === void 0 ? void 0 : _b.offsetWidth) > 0;
+        return this.sourceImage?.nativeElement?.offsetWidth > 0;
     }
     onResize() {
         if (!this.loadedImage) {
@@ -1065,16 +1054,23 @@ class ImageCropperComponent {
         this.moveStop();
     }
     startMove(event, moveType, position = null) {
-        var _a, _b;
         if (this.disabled
-            || ((_a = this.moveStart) === null || _a === void 0 ? void 0 : _a.active) && ((_b = this.moveStart) === null || _b === void 0 ? void 0 : _b.type) === MoveTypes.Pinch
+            || this.moveStart?.active && this.moveStart?.type === MoveTypes.Pinch
             || moveType === MoveTypes.Drag && !this.allowMoveImage) {
             return;
         }
         if (event.preventDefault) {
             event.preventDefault();
         }
-        this.moveStart = Object.assign({ active: true, type: moveType, position, transform: Object.assign({}, this.transform), clientX: this.cropperPositionService.getClientX(event), clientY: this.cropperPositionService.getClientY(event) }, this.cropper);
+        this.moveStart = {
+            active: true,
+            type: moveType,
+            position,
+            transform: { ...this.transform },
+            clientX: this.cropperPositionService.getClientX(event),
+            clientY: this.cropperPositionService.getClientY(event),
+            ...this.cropper
+        };
     }
     startPinch(event) {
         if (!this.safeImgDataUrl) {
@@ -1083,10 +1079,16 @@ class ImageCropperComponent {
         if (event.preventDefault) {
             event.preventDefault();
         }
-        this.moveStart = Object.assign({ active: true, type: MoveTypes.Pinch, position: 'center', clientX: this.cropper.x1 + (this.cropper.x2 - this.cropper.x1) / 2, clientY: this.cropper.y1 + (this.cropper.y2 - this.cropper.y1) / 2 }, this.cropper);
+        this.moveStart = {
+            active: true,
+            type: MoveTypes.Pinch,
+            position: 'center',
+            clientX: this.cropper.x1 + (this.cropper.x2 - this.cropper.x1) / 2,
+            clientY: this.cropper.y1 + (this.cropper.y2 - this.cropper.y1) / 2,
+            ...this.cropper
+        };
     }
     moveImg(event) {
-        var _a, _b;
         if (this.moveStart.active) {
             if (event.stopPropagation) {
                 event.stopPropagation();
@@ -1108,7 +1110,11 @@ class ImageCropperComponent {
             else if (this.moveStart.type === MoveTypes.Drag) {
                 const diffX = this.cropperPositionService.getClientX(event) - this.moveStart.clientX;
                 const diffY = this.cropperPositionService.getClientY(event) - this.moveStart.clientY;
-                this.transform = Object.assign(Object.assign({}, this.transform), { translateH: (((_a = this.moveStart.transform) === null || _a === void 0 ? void 0 : _a.translateH) || 0) + diffX, translateV: (((_b = this.moveStart.transform) === null || _b === void 0 ? void 0 : _b.translateV) || 0) + diffY });
+                this.transform = {
+                    ...this.transform,
+                    translateH: (this.moveStart.transform?.translateH || 0) + diffX,
+                    translateV: (this.moveStart.transform?.translateV || 0) + diffY
+                };
                 this.setCssTransform();
             }
             this.cd.detectChanges();
@@ -1138,8 +1144,7 @@ class ImageCropperComponent {
         }
     }
     setCropperScaledMinSize() {
-        var _a, _b;
-        if ((_b = (_a = this.loadedImage) === null || _a === void 0 ? void 0 : _a.transformed) === null || _b === void 0 ? void 0 : _b.image) {
+        if (this.loadedImage?.transformed?.image) {
             this.setCropperScaledMinWidth();
             this.setCropperScaledMinHeight();
         }
@@ -1165,8 +1170,7 @@ class ImageCropperComponent {
         }
     }
     setCropperScaledMaxSize() {
-        var _a, _b;
-        if ((_b = (_a = this.loadedImage) === null || _a === void 0 ? void 0 : _a.transformed) === null || _b === void 0 ? void 0 : _b.image) {
+        if (this.loadedImage?.transformed?.image) {
             const ratio = this.loadedImage.transformed.size.width / this.maxSize.width;
             this.settings.cropperScaledMaxWidth = this.cropperMaxWidth > 20 ? this.cropperMaxWidth / ratio : this.maxSize.width;
             this.settings.cropperScaledMaxHeight = this.cropperMaxHeight > 20 ? this.cropperMaxHeight / ratio : this.maxSize.height;
@@ -1203,11 +1207,10 @@ class ImageCropperComponent {
         }
     }
     moveStop() {
-        var _a;
         if (this.moveStart.active) {
             console.log('change!');
             this.moveStart.active = false;
-            if (((_a = this.moveStart) === null || _a === void 0 ? void 0 : _a.type) === MoveTypes.Drag) {
+            if (this.moveStart?.type === MoveTypes.Drag) {
                 this.transformChange.emit(this.transform);
             }
             else {
@@ -1227,8 +1230,7 @@ class ImageCropperComponent {
         }
     }
     crop() {
-        var _a, _b;
-        if (((_b = (_a = this.loadedImage) === null || _a === void 0 ? void 0 : _a.transformed) === null || _b === void 0 ? void 0 : _b.image) != null) {
+        if (this.loadedImage?.transformed?.image != null) {
             this.startCropImage.emit();
             const output = this.cropService.crop(this.sourceImage, this.loadedImage, this.cropper, this.settings);
             if (output != null) {
@@ -1242,10 +1244,10 @@ class ImageCropperComponent {
         const currentCropAspectRatio = (this.cropper.x2 - this.cropper.x1) / (this.cropper.y2 - this.cropper.y1);
         return currentCropAspectRatio === this.aspectRatio;
     }
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: ImageCropperComponent, deps: [{ token: CropService }, { token: CropperPositionService }, { token: LoadImageService }, { token: i4.DomSanitizer }, { token: i0.ChangeDetectorRef }], target: i0.ɵɵFactoryTarget.Component }); }
+    static { this.ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "16.0.3", type: ImageCropperComponent, selector: "image-cropper", inputs: { imageChangedEvent: "imageChangedEvent", imageURL: "imageURL", imageBase64: "imageBase64", imageFile: "imageFile", imageAltText: "imageAltText", format: "format", transform: "transform", maintainAspectRatio: "maintainAspectRatio", aspectRatio: "aspectRatio", resetCropOnAspectRatioChange: "resetCropOnAspectRatioChange", resizeToWidth: "resizeToWidth", resizeToHeight: "resizeToHeight", cropperMinWidth: "cropperMinWidth", cropperMinHeight: "cropperMinHeight", cropperMaxHeight: "cropperMaxHeight", cropperMaxWidth: "cropperMaxWidth", cropperStaticWidth: "cropperStaticWidth", cropperStaticHeight: "cropperStaticHeight", canvasRotation: "canvasRotation", initialStepSize: "initialStepSize", roundCropper: "roundCropper", onlyScaleDown: "onlyScaleDown", imageQuality: "imageQuality", autoCrop: "autoCrop", backgroundColor: "backgroundColor", containWithinAspectRatio: "containWithinAspectRatio", hideResizeSquares: "hideResizeSquares", allowMoveImage: "allowMoveImage", cropper: "cropper", alignImage: "alignImage", disabled: "disabled", hidden: "hidden" }, outputs: { imageCropped: "imageCropped", startCropImage: "startCropImage", imageLoaded: "imageLoaded", cropperReady: "cropperReady", loadImageFailed: "loadImageFailed", transformChange: "transformChange", cropping: "cropping" }, host: { listeners: { "window:resize": "onResize()", "document:mousemove": "moveImg($event)", "document:touchmove": "moveImg($event)", "document:mouseup": "moveStop()", "document:touchend": "moveStop()" }, properties: { "style.text-align": "this.alignImage", "class.disabled": "this.disabled", "class.ngx-ix-hidden": "this.hidden" } }, viewQueries: [{ propertyName: "wrapper", first: true, predicate: ["wrapper"], descendants: true, static: true }, { propertyName: "sourceImage", first: true, predicate: ["sourceImage"], descendants: true }], usesOnChanges: true, ngImport: i0, template: "<div\n  [style.background]=\"imageVisible && backgroundColor\"\n  #wrapper\n>\n  <img\n    #sourceImage\n    class=\"ngx-ic-source-image\"\n    *ngIf=\"safeImgDataUrl\"\n    [src]=\"safeImgDataUrl\"\n    [style.visibility]=\"imageVisible ? 'visible' : 'hidden'\"\n    [style.transform]=\"safeTransformStyle\"\n    [class.ngx-ic-draggable]=\"!disabled && allowMoveImage\"\n    [attr.alt]=\"imageAltText\"\n    (load)=\"imageLoadedInView()\"\n    (mousedown)=\"startMove($event, moveTypes.Drag)\"\n    (touchstart)=\"startMove($event, moveTypes.Drag)\"\n    (error)=\"loadImageError($event)\"\n  >\n  <div\n    class=\"ngx-ic-overlay\"\n    [style.width.px]=\"maxSize.width\"\n    [style.height.px]=\"maxSize.height\"\n    [style.margin-left]=\"alignImage === 'center' ? marginLeft : null\"\n  ></div>\n  <div class=\"ngx-ic-cropper\"\n       *ngIf=\"imageVisible\"\n       [class.ngx-ic-round]=\"roundCropper\"\n       [style.top.px]=\"cropper.y1\"\n       [style.left.px]=\"cropper.x1\"\n       [style.width.px]=\"cropper.x2 - cropper.x1\"\n       [style.height.px]=\"cropper.y2 - cropper.y1\"\n       [style.margin-left]=\"alignImage === 'center' ? marginLeft : null\"\n       [style.visibility]=\"imageVisible ? 'visible' : 'hidden'\"\n       (keydown)=\"keyboardAccess($event)\"\n       tabindex=\"0\"\n  >\n    <div\n      (mousedown)=\"startMove($event, moveTypes.Move)\"\n      (touchstart)=\"startMove($event, moveTypes.Move)\"\n      class=\"ngx-ic-move\">\n    </div>\n    <ng-container *ngIf=\"!hideResizeSquares\">\n            <span class=\"ngx-ic-resize ngx-ic-topleft\"\n                  (mousedown)=\"startMove($event, moveTypes.Resize, 'topleft')\"\n                  (touchstart)=\"startMove($event, moveTypes.Resize, 'topleft')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-top\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-topright\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'topright')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'topright')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-right\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-bottomright\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'bottomright')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'bottomright')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-bottom\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-bottomleft\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'bottomleft')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'bottomleft')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-left\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-top\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'top')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'top')\">\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-right\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'right')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'right')\">\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-bottom\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'bottom')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'bottom')\">\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-left\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'left')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'left')\">\n            </span>\n    </ng-container>\n  </div>\n</div>\n", styles: [":host{display:flex;position:relative;width:100%;max-width:100%;max-height:100%;overflow:hidden;padding:5px;text-align:center}:host>div{width:100%;position:relative}:host>div img.ngx-ic-source-image{max-width:100%;max-height:100%;transform-origin:center}:host>div img.ngx-ic-source-image.ngx-ic-draggable{user-drag:none;-webkit-user-drag:none;user-select:none;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;cursor:grab}:host .ngx-ic-overlay{position:absolute;pointer-events:none;touch-action:none;outline:var(--cropper-overlay-color, white) solid 100vw;top:0;left:0}:host .ngx-ic-cropper{position:absolute;display:flex;color:#53535c;background:transparent;outline:rgba(255,255,255,.3) solid 100vw;outline:var(--cropper-outline-color, rgba(255, 255, 255, .3)) solid 100vw;touch-action:none}@media (orientation: portrait){:host .ngx-ic-cropper{outline-width:100vh}}:host .ngx-ic-cropper:after{position:absolute;content:\"\";inset:0;pointer-events:none;border:dashed 1px;opacity:.75;color:inherit;z-index:1}:host .ngx-ic-cropper .ngx-ic-move{width:100%;cursor:move;border:1px solid rgba(255,255,255,.5)}:host .ngx-ic-cropper:focus .ngx-ic-move{border-color:#1e90ff;border-width:2px}:host .ngx-ic-cropper .ngx-ic-resize{position:absolute;display:inline-block;line-height:6px;padding:8px;opacity:.85;z-index:1}:host .ngx-ic-cropper .ngx-ic-resize .ngx-ic-square{display:inline-block;background:#53535C;width:6px;height:6px;border:1px solid rgba(255,255,255,.5);box-sizing:content-box}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-topleft{top:-12px;left:-12px;cursor:nwse-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-top{top:-12px;left:calc(50% - 12px);cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-topright{top:-12px;right:-12px;cursor:nesw-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-right{top:calc(50% - 12px);right:-12px;cursor:ew-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-bottomright{bottom:-12px;right:-12px;cursor:nwse-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-bottom{bottom:-12px;left:calc(50% - 12px);cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-bottomleft{bottom:-12px;left:-12px;cursor:nesw-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-left{top:calc(50% - 12px);left:-12px;cursor:ew-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar{position:absolute;z-index:1}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-top{top:-11px;left:11px;width:calc(100% - 22px);height:22px;cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-right{top:11px;right:-11px;height:calc(100% - 22px);width:22px;cursor:ew-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-bottom{bottom:-11px;left:11px;width:calc(100% - 22px);height:22px;cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-left{top:11px;left:-11px;height:calc(100% - 22px);width:22px;cursor:ew-resize}:host .ngx-ic-cropper.ngx-ic-round{outline-color:transparent}:host .ngx-ic-cropper.ngx-ic-round:after{border-radius:100%;box-shadow:0 0 0 100vw #ffffff4d;box-shadow:0 0 0 100vw var(--cropper-outline-color, rgba(255, 255, 255, .3))}@media (orientation: portrait){:host .ngx-ic-cropper.ngx-ic-round:after{box-shadow:0 0 0 100vh #ffffff4d;box-shadow:0 0 0 100vh var(--cropper-outline-color, rgba(255, 255, 255, .3))}}:host .ngx-ic-cropper.ngx-ic-round .ngx-ic-move{border-radius:100%}:host.disabled .ngx-ic-cropper .ngx-ic-resize,:host.disabled .ngx-ic-cropper .ngx-ic-resize-bar,:host.disabled .ngx-ic-cropper .ngx-ic-move{display:none}:host.ngx-ix-hidden{display:none}\n"], dependencies: [{ kind: "directive", type: i5.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }], changeDetection: i0.ChangeDetectionStrategy.OnPush }); }
 }
-ImageCropperComponent.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: ImageCropperComponent, deps: [{ token: CropService }, { token: CropperPositionService }, { token: LoadImageService }, { token: i4.DomSanitizer }, { token: i0.ChangeDetectorRef }], target: i0.ɵɵFactoryTarget.Component });
-ImageCropperComponent.ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "12.0.0", version: "13.3.11", type: ImageCropperComponent, selector: "image-cropper", inputs: { imageChangedEvent: "imageChangedEvent", imageURL: "imageURL", imageBase64: "imageBase64", imageFile: "imageFile", imageAltText: "imageAltText", format: "format", transform: "transform", maintainAspectRatio: "maintainAspectRatio", aspectRatio: "aspectRatio", resetCropOnAspectRatioChange: "resetCropOnAspectRatioChange", resizeToWidth: "resizeToWidth", resizeToHeight: "resizeToHeight", cropperMinWidth: "cropperMinWidth", cropperMinHeight: "cropperMinHeight", cropperMaxHeight: "cropperMaxHeight", cropperMaxWidth: "cropperMaxWidth", cropperStaticWidth: "cropperStaticWidth", cropperStaticHeight: "cropperStaticHeight", canvasRotation: "canvasRotation", initialStepSize: "initialStepSize", roundCropper: "roundCropper", onlyScaleDown: "onlyScaleDown", imageQuality: "imageQuality", autoCrop: "autoCrop", backgroundColor: "backgroundColor", containWithinAspectRatio: "containWithinAspectRatio", hideResizeSquares: "hideResizeSquares", allowMoveImage: "allowMoveImage", cropper: "cropper", alignImage: "alignImage", disabled: "disabled", hidden: "hidden" }, outputs: { imageCropped: "imageCropped", startCropImage: "startCropImage", imageLoaded: "imageLoaded", cropperReady: "cropperReady", loadImageFailed: "loadImageFailed", transformChange: "transformChange", cropping: "cropping" }, host: { listeners: { "window:resize": "onResize()", "document:mousemove": "moveImg($event)", "document:touchmove": "moveImg($event)", "document:mouseup": "moveStop()", "document:touchend": "moveStop()" }, properties: { "style.text-align": "this.alignImage", "class.disabled": "this.disabled", "class.ngx-ix-hidden": "this.hidden" } }, viewQueries: [{ propertyName: "wrapper", first: true, predicate: ["wrapper"], descendants: true, static: true }, { propertyName: "sourceImage", first: true, predicate: ["sourceImage"], descendants: true }], usesOnChanges: true, ngImport: i0, template: "<div\n  [style.background]=\"imageVisible && backgroundColor\"\n  #wrapper\n>\n  <img\n    #sourceImage\n    class=\"ngx-ic-source-image\"\n    *ngIf=\"safeImgDataUrl\"\n    [src]=\"safeImgDataUrl\"\n    [style.visibility]=\"imageVisible ? 'visible' : 'hidden'\"\n    [style.transform]=\"safeTransformStyle\"\n    [class.ngx-ic-draggable]=\"!disabled && allowMoveImage\"\n    [attr.alt]=\"imageAltText\"\n    (load)=\"imageLoadedInView()\"\n    (mousedown)=\"startMove($event, moveTypes.Drag)\"\n    (touchstart)=\"startMove($event, moveTypes.Drag)\"\n    (error)=\"loadImageError($event)\"\n  >\n  <div\n    class=\"ngx-ic-overlay\"\n    [style.width.px]=\"maxSize.width\"\n    [style.height.px]=\"maxSize.height\"\n    [style.margin-left]=\"alignImage === 'center' ? marginLeft : null\"\n  ></div>\n  <div class=\"ngx-ic-cropper\"\n       *ngIf=\"imageVisible\"\n       [class.ngx-ic-round]=\"roundCropper\"\n       [style.top.px]=\"cropper.y1\"\n       [style.left.px]=\"cropper.x1\"\n       [style.width.px]=\"cropper.x2 - cropper.x1\"\n       [style.height.px]=\"cropper.y2 - cropper.y1\"\n       [style.margin-left]=\"alignImage === 'center' ? marginLeft : null\"\n       [style.visibility]=\"imageVisible ? 'visible' : 'hidden'\"\n       (keydown)=\"keyboardAccess($event)\"\n       tabindex=\"0\"\n  >\n    <div\n      (mousedown)=\"startMove($event, moveTypes.Move)\"\n      (touchstart)=\"startMove($event, moveTypes.Move)\"\n      class=\"ngx-ic-move\">\n    </div>\n    <ng-container *ngIf=\"!hideResizeSquares\">\n            <span class=\"ngx-ic-resize ngx-ic-topleft\"\n                  (mousedown)=\"startMove($event, moveTypes.Resize, 'topleft')\"\n                  (touchstart)=\"startMove($event, moveTypes.Resize, 'topleft')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-top\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-topright\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'topright')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'topright')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-right\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-bottomright\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'bottomright')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'bottomright')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-bottom\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-bottomleft\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'bottomleft')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'bottomleft')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-left\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-top\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'top')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'top')\">\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-right\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'right')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'right')\">\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-bottom\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'bottom')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'bottom')\">\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-left\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'left')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'left')\">\n            </span>\n    </ng-container>\n  </div>\n</div>\n", styles: [":host{display:flex;position:relative;width:100%;max-width:100%;max-height:100%;overflow:hidden;padding:5px;text-align:center}:host>div{width:100%;position:relative}:host>div img.ngx-ic-source-image{max-width:100%;max-height:100%;transform-origin:center}:host>div img.ngx-ic-source-image.ngx-ic-draggable{user-drag:none;-webkit-user-drag:none;user-select:none;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;cursor:grab}:host .ngx-ic-overlay{position:absolute;pointer-events:none;touch-action:none;outline:var(--cropper-overlay-color, white) solid 100vw;top:0;left:0}:host .ngx-ic-cropper{position:absolute;display:flex;color:#53535c;background:transparent;outline:rgba(255,255,255,.3) solid 100vw;outline:var(--cropper-outline-color, rgba(255, 255, 255, .3)) solid 100vw;touch-action:none}@media (orientation: portrait){:host .ngx-ic-cropper{outline-width:100vh}}:host .ngx-ic-cropper:after{position:absolute;content:\"\";inset:0;pointer-events:none;border:dashed 1px;opacity:.75;color:inherit;z-index:1}:host .ngx-ic-cropper .ngx-ic-move{width:100%;cursor:move;border:1px solid rgba(255,255,255,.5)}:host .ngx-ic-cropper:focus .ngx-ic-move{border-color:#1e90ff;border-width:2px}:host .ngx-ic-cropper .ngx-ic-resize{position:absolute;display:inline-block;line-height:6px;padding:8px;opacity:.85;z-index:1}:host .ngx-ic-cropper .ngx-ic-resize .ngx-ic-square{display:inline-block;background:#53535C;width:6px;height:6px;border:1px solid rgba(255,255,255,.5);box-sizing:content-box}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-topleft{top:-12px;left:-12px;cursor:nwse-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-top{top:-12px;left:calc(50% - 12px);cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-topright{top:-12px;right:-12px;cursor:nesw-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-right{top:calc(50% - 12px);right:-12px;cursor:ew-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-bottomright{bottom:-12px;right:-12px;cursor:nwse-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-bottom{bottom:-12px;left:calc(50% - 12px);cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-bottomleft{bottom:-12px;left:-12px;cursor:nesw-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-left{top:calc(50% - 12px);left:-12px;cursor:ew-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar{position:absolute;z-index:1}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-top{top:-11px;left:11px;width:calc(100% - 22px);height:22px;cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-right{top:11px;right:-11px;height:calc(100% - 22px);width:22px;cursor:ew-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-bottom{bottom:-11px;left:11px;width:calc(100% - 22px);height:22px;cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-left{top:11px;left:-11px;height:calc(100% - 22px);width:22px;cursor:ew-resize}:host .ngx-ic-cropper.ngx-ic-round{outline-color:transparent}:host .ngx-ic-cropper.ngx-ic-round:after{border-radius:100%;box-shadow:0 0 0 100vw #ffffff4d;box-shadow:0 0 0 100vw var(--cropper-outline-color, rgba(255, 255, 255, .3))}@media (orientation: portrait){:host .ngx-ic-cropper.ngx-ic-round:after{box-shadow:0 0 0 100vh #ffffff4d;box-shadow:0 0 0 100vh var(--cropper-outline-color, rgba(255, 255, 255, .3))}}:host .ngx-ic-cropper.ngx-ic-round .ngx-ic-move{border-radius:100%}:host.disabled .ngx-ic-cropper .ngx-ic-resize,:host.disabled .ngx-ic-cropper .ngx-ic-resize-bar,:host.disabled .ngx-ic-cropper .ngx-ic-move{display:none}:host.ngx-ix-hidden{display:none}\n"], directives: [{ type: i5.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }], changeDetection: i0.ChangeDetectionStrategy.OnPush });
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: ImageCropperComponent, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: ImageCropperComponent, decorators: [{
             type: Component,
             args: [{ selector: 'image-cropper', changeDetection: ChangeDetectionStrategy.OnPush, template: "<div\n  [style.background]=\"imageVisible && backgroundColor\"\n  #wrapper\n>\n  <img\n    #sourceImage\n    class=\"ngx-ic-source-image\"\n    *ngIf=\"safeImgDataUrl\"\n    [src]=\"safeImgDataUrl\"\n    [style.visibility]=\"imageVisible ? 'visible' : 'hidden'\"\n    [style.transform]=\"safeTransformStyle\"\n    [class.ngx-ic-draggable]=\"!disabled && allowMoveImage\"\n    [attr.alt]=\"imageAltText\"\n    (load)=\"imageLoadedInView()\"\n    (mousedown)=\"startMove($event, moveTypes.Drag)\"\n    (touchstart)=\"startMove($event, moveTypes.Drag)\"\n    (error)=\"loadImageError($event)\"\n  >\n  <div\n    class=\"ngx-ic-overlay\"\n    [style.width.px]=\"maxSize.width\"\n    [style.height.px]=\"maxSize.height\"\n    [style.margin-left]=\"alignImage === 'center' ? marginLeft : null\"\n  ></div>\n  <div class=\"ngx-ic-cropper\"\n       *ngIf=\"imageVisible\"\n       [class.ngx-ic-round]=\"roundCropper\"\n       [style.top.px]=\"cropper.y1\"\n       [style.left.px]=\"cropper.x1\"\n       [style.width.px]=\"cropper.x2 - cropper.x1\"\n       [style.height.px]=\"cropper.y2 - cropper.y1\"\n       [style.margin-left]=\"alignImage === 'center' ? marginLeft : null\"\n       [style.visibility]=\"imageVisible ? 'visible' : 'hidden'\"\n       (keydown)=\"keyboardAccess($event)\"\n       tabindex=\"0\"\n  >\n    <div\n      (mousedown)=\"startMove($event, moveTypes.Move)\"\n      (touchstart)=\"startMove($event, moveTypes.Move)\"\n      class=\"ngx-ic-move\">\n    </div>\n    <ng-container *ngIf=\"!hideResizeSquares\">\n            <span class=\"ngx-ic-resize ngx-ic-topleft\"\n                  (mousedown)=\"startMove($event, moveTypes.Resize, 'topleft')\"\n                  (touchstart)=\"startMove($event, moveTypes.Resize, 'topleft')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-top\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-topright\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'topright')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'topright')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-right\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-bottomright\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'bottomright')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'bottomright')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-bottom\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-bottomleft\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'bottomleft')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'bottomleft')\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize ngx-ic-left\">\n                <span class=\"ngx-ic-square\"></span>\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-top\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'top')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'top')\">\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-right\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'right')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'right')\">\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-bottom\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'bottom')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'bottom')\">\n            </span>\n      <span class=\"ngx-ic-resize-bar ngx-ic-left\"\n            (mousedown)=\"startMove($event, moveTypes.Resize, 'left')\"\n            (touchstart)=\"startMove($event, moveTypes.Resize, 'left')\">\n            </span>\n    </ng-container>\n  </div>\n</div>\n", styles: [":host{display:flex;position:relative;width:100%;max-width:100%;max-height:100%;overflow:hidden;padding:5px;text-align:center}:host>div{width:100%;position:relative}:host>div img.ngx-ic-source-image{max-width:100%;max-height:100%;transform-origin:center}:host>div img.ngx-ic-source-image.ngx-ic-draggable{user-drag:none;-webkit-user-drag:none;user-select:none;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;cursor:grab}:host .ngx-ic-overlay{position:absolute;pointer-events:none;touch-action:none;outline:var(--cropper-overlay-color, white) solid 100vw;top:0;left:0}:host .ngx-ic-cropper{position:absolute;display:flex;color:#53535c;background:transparent;outline:rgba(255,255,255,.3) solid 100vw;outline:var(--cropper-outline-color, rgba(255, 255, 255, .3)) solid 100vw;touch-action:none}@media (orientation: portrait){:host .ngx-ic-cropper{outline-width:100vh}}:host .ngx-ic-cropper:after{position:absolute;content:\"\";inset:0;pointer-events:none;border:dashed 1px;opacity:.75;color:inherit;z-index:1}:host .ngx-ic-cropper .ngx-ic-move{width:100%;cursor:move;border:1px solid rgba(255,255,255,.5)}:host .ngx-ic-cropper:focus .ngx-ic-move{border-color:#1e90ff;border-width:2px}:host .ngx-ic-cropper .ngx-ic-resize{position:absolute;display:inline-block;line-height:6px;padding:8px;opacity:.85;z-index:1}:host .ngx-ic-cropper .ngx-ic-resize .ngx-ic-square{display:inline-block;background:#53535C;width:6px;height:6px;border:1px solid rgba(255,255,255,.5);box-sizing:content-box}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-topleft{top:-12px;left:-12px;cursor:nwse-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-top{top:-12px;left:calc(50% - 12px);cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-topright{top:-12px;right:-12px;cursor:nesw-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-right{top:calc(50% - 12px);right:-12px;cursor:ew-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-bottomright{bottom:-12px;right:-12px;cursor:nwse-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-bottom{bottom:-12px;left:calc(50% - 12px);cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-bottomleft{bottom:-12px;left:-12px;cursor:nesw-resize}:host .ngx-ic-cropper .ngx-ic-resize.ngx-ic-left{top:calc(50% - 12px);left:-12px;cursor:ew-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar{position:absolute;z-index:1}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-top{top:-11px;left:11px;width:calc(100% - 22px);height:22px;cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-right{top:11px;right:-11px;height:calc(100% - 22px);width:22px;cursor:ew-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-bottom{bottom:-11px;left:11px;width:calc(100% - 22px);height:22px;cursor:ns-resize}:host .ngx-ic-cropper .ngx-ic-resize-bar.ngx-ic-left{top:11px;left:-11px;height:calc(100% - 22px);width:22px;cursor:ew-resize}:host .ngx-ic-cropper.ngx-ic-round{outline-color:transparent}:host .ngx-ic-cropper.ngx-ic-round:after{border-radius:100%;box-shadow:0 0 0 100vw #ffffff4d;box-shadow:0 0 0 100vw var(--cropper-outline-color, rgba(255, 255, 255, .3))}@media (orientation: portrait){:host .ngx-ic-cropper.ngx-ic-round:after{box-shadow:0 0 0 100vh #ffffff4d;box-shadow:0 0 0 100vh var(--cropper-outline-color, rgba(255, 255, 255, .3))}}:host .ngx-ic-cropper.ngx-ic-round .ngx-ic-move{border-radius:100%}:host.disabled .ngx-ic-cropper .ngx-ic-resize,:host.disabled .ngx-ic-cropper .ngx-ic-resize-bar,:host.disabled .ngx-ic-cropper .ngx-ic-move{display:none}:host.ngx-ix-hidden{display:none}\n"] }]
         }], ctorParameters: function () { return [{ type: CropService }, { type: CropperPositionService }, { type: LoadImageService }, { type: i4.DomSanitizer }, { type: i0.ChangeDetectorRef }]; }, propDecorators: { wrapper: [{
@@ -1359,13 +1361,11 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "13.3.11", ngImpo
             }] } });
 
 class ImageCropperModule {
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: ImageCropperModule, deps: [], target: i0.ɵɵFactoryTarget.NgModule }); }
+    static { this.ɵmod = i0.ɵɵngDeclareNgModule({ minVersion: "14.0.0", version: "16.0.3", ngImport: i0, type: ImageCropperModule, declarations: [ImageCropperComponent], imports: [CommonModule], exports: [ImageCropperComponent] }); }
+    static { this.ɵinj = i0.ɵɵngDeclareInjector({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: ImageCropperModule, imports: [CommonModule] }); }
 }
-ImageCropperModule.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: ImageCropperModule, deps: [], target: i0.ɵɵFactoryTarget.NgModule });
-ImageCropperModule.ɵmod = i0.ɵɵngDeclareNgModule({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: ImageCropperModule, declarations: [ImageCropperComponent], imports: [CommonModule], exports: [ImageCropperComponent] });
-ImageCropperModule.ɵinj = i0.ɵɵngDeclareInjector({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: ImageCropperModule, imports: [[
-            CommonModule
-        ]] });
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "13.3.11", ngImport: i0, type: ImageCropperModule, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.0.3", ngImport: i0, type: ImageCropperModule, decorators: [{
             type: NgModule,
             args: [{
                     imports: [

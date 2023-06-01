@@ -26,23 +26,17 @@
     "@angular/common": ">=13.0.0",
     "@angular/core": ">=13.0.0"
   },
-  "module": "fesm2015/ngx-image-cropper.mjs",
-  "es2020": "fesm2020/ngx-image-cropper.mjs",
-  "esm2020": "esm2020/ngx-image-cropper.mjs",
-  "fesm2020": "fesm2020/ngx-image-cropper.mjs",
-  "fesm2015": "fesm2015/ngx-image-cropper.mjs",
-  "typings": "ngx-image-cropper.d.ts",
+  "module": "fesm2022/ngx-image-cropper.mjs",
+  "typings": "index.d.ts",
   "exports": {
     "./package.json": {
       "default": "./package.json"
     },
     ".": {
-      "types": "./ngx-image-cropper.d.ts",
-      "esm2020": "./esm2020/ngx-image-cropper.mjs",
-      "es2020": "./fesm2020/ngx-image-cropper.mjs",
-      "es2015": "./fesm2015/ngx-image-cropper.mjs",
-      "node": "./fesm2015/ngx-image-cropper.mjs",
-      "default": "./fesm2020/ngx-image-cropper.mjs"
+      "types": "./index.d.ts",
+      "esm2022": "./esm2022/ngx-image-cropper.mjs",
+      "esm": "./esm2022/ngx-image-cropper.mjs",
+      "default": "./fesm2022/ngx-image-cropper.mjs"
     }
   },
   "sideEffects": false,

@@ -24,4 +24,4 @@ export interface CropperOptions {
     hideResizeSquares: boolean;
     alignImage: 'left' | 'center';
 }
-export declare type OutputFormat = 'png' | 'jpeg' | 'bmp' | 'webp' | 'ico';
+export type OutputFormat = 'png' | 'jpeg' | 'bmp' | 'webp' | 'ico';
