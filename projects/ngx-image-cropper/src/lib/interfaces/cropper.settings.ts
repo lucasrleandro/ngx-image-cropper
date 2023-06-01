@@ -7,6 +7,7 @@ export class CropperSettings {
   // From options
   format: OutputFormat = 'png';
   maintainAspectRatio = true;
+  bottomRightSquareOnly = false;
   transform: ImageTransform = {};
   aspectRatio = 1;
   resetCropOnAspectRatioChange = true;
@@ -28,6 +29,7 @@ export class CropperSettings {
   containWithinAspectRatio = false;
   hideResizeSquares = false;
   alignImage: 'left' | 'center' = 'center';
+  multipleAspectRatio = false; // custom Trokaí
 
   // Internal
   cropperScaledMinWidth = 20;

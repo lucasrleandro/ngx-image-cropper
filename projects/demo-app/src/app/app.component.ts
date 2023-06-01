@@ -22,7 +22,7 @@ export class AppComponent {
   };
   imageURL?: string;
   loading = false;
-  allowMoveImage = false;
+  allowMoveImage = true;
   hidden = false;
 
   fileChangeEvent(event: any): void {
